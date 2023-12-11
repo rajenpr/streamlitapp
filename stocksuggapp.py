@@ -72,6 +72,7 @@ if st.button("Show Open Trades"):
             "Entry Price": "{:.2f}".format(trade['entry_price']),
             "Target Price": "{:.2f}".format(trade['target_price']),
             "Current Price": "{:.2f}".format(current_price) if current_price is not None else "N/A",
+            "Duration":trade['duration'],
             "Potential Gain (%)": potential_gain_formatted
         })
 
