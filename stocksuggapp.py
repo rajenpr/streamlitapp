@@ -3,7 +3,7 @@ import pymongo
 import yfinance as yf
 
 # MongoDB Connection String (Replace with your actual credentials)
-mongo_conn_str = st.secrets["mongodb+srv://prajendr:Mazda123@cluster0.5hmuadl.mongodb.net/?retryWrites=true&w=majority"]
+mongo_conn_str = "mongodb+srv://prajendr:Mazda123@cluster0.5hmuadl.mongodb.net/?retryWrites=true&w=majority"
 
 # Initialize connection to MongoDB
 client = pymongo.MongoClient(mongo_conn_str)
