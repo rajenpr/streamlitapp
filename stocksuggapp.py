@@ -50,13 +50,28 @@ with st.form("stock_input"):
         insert_trade(trade_data)
         st.success("Trade data submitted!")
 
-# Display open trades
 if st.button("Show Open Trades"):
     open_trades = get_open_trades()
+
+    # Create a list to store our table data
+    table_data = []
+
     for trade in open_trades:
         current_price = get_current_price(trade['ticker_symbol'])
         potential_gain = ((trade['target_price'] - current_price) / current_price) * 100
-        st.write(f"Stock: {trade['stock_name']} ({trade['ticker_symbol']})")
-        st.write(f"Entry Price: {trade['entry_price']}, Target Price: {trade['target_price']}, Current Price: {current_price}")
-        st.write(f"Potential Gain: {potential_gain:.2f}%")
+
+        # Append a dictionary for each trade to our list
+        table_data.append({
+            "Stock": f"{trade['stock_name']} ({trade['ticker_symbol']})",
+            "Entry Price": trade['entry_price'],
+            "Target Price": trade['target_price'],
+            "Current Price": current_price,
+            "Potential Gain (%)": f"{potential_gain:.2f}"
+        })
+
+    # Convert list to DataFrame
+    trades_df = pd.DataFrame(table_data)
+
+    # Display the DataFrame as a table
+    st.table(trades_df)
 
