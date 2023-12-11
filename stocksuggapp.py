@@ -72,7 +72,8 @@ if st.button("Show Open Trades"):
         })
 
     # Convert list to DataFrame
-    trades_df = pd.DataFrame(table_data)
+       trades_df[['Entry Price', 'Target Price', 'Current Price', 'Potential Gain (%)']] = \
+        trades_df[['Entry Price', 'Target Price', 'Current Price', 'Potential Gain (%)']].round(2)
 
     # Display the DataFrame as a table
     st.table(trades_df)
