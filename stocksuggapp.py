@@ -52,7 +52,6 @@ with st.form("stock_input"):
         st.success("Trade data submitted!")
 
 # Display open trades
-# Display open trades
 if st.button("Show Open Trades"):
     open_trades = get_open_trades()
 
@@ -61,24 +60,29 @@ if st.button("Show Open Trades"):
 
     for trade in open_trades:
         current_price = get_current_price(trade['ticker_symbol'])
-        potential_gain = ((trade['target_price'] - current_price) / current_price) * 100
+        if current_price is not None:
+            potential_gain = ((trade['target_price'] - current_price) / current_price) * 100
+        else:
+            potential_gain = "N/A"  # or some default value
 
         # Append a dictionary for each trade to our list
         table_data.append({
             "Stock": f"{trade['stock_name']} ({trade['ticker_symbol']})",
             "Entry Price": trade['entry_price'],
             "Target Price": trade['target_price'],
-            "Current Price": current_price,
+            "Current Price": current_price if current_price is not None else "N/A",
             "Potential Gain (%)": potential_gain
         })
 
     # Convert list to DataFrame
     trades_df = pd.DataFrame(table_data)
 
-    # Handle the numerical values
+    # Convert to numeric and round the numerical columns to two decimal places
     for col in ['Entry Price', 'Target Price', 'Current Price', 'Potential Gain (%)']:
-        trades_df[col] = trades_df[col].apply(lambda x: float(str(x).replace(',', ''))).round(2)
+        if col != "Potential Gain (%)":  # Skip this for potential gain if it can be "N/A"
+            trades_df[col] = pd.to_numeric(trades_df[col], errors='coerce').fillna(0).round(2)
+        else:
+            trades_df[col] = pd.to_numeric(trades_df[col], errors='coerce').round(2)
 
     # Display the DataFrame as a table
     st.table(trades_df)
-
