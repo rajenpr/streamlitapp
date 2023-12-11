@@ -19,7 +19,7 @@ def get_open_trades():
 
 def get_current_price(ticker):
     ticker_final=ticker+'.NS'
-    stock = yf.Ticker(ticker)
+    stock = yf.Ticker(ticker_final)
     history = stock.history().tail(1)
     if not history.empty:
         return history['Close'].iloc[0]
