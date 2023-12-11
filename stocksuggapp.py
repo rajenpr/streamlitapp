@@ -3,6 +3,8 @@ import pymongo
 import yfinance as yf
 import pandas as pd
 
+st.set_page_config(layout="wide")
+
 # MongoDB Connection String (Replace with your actual credentials)
 mongo_conn_str = "mongodb+srv://prajendr:Mazda123@cluster0.5hmuadl.mongodb.net/stocksuggappdb?retryWrites=true&w=majority"
 
