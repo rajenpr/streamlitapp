@@ -19,7 +19,11 @@ def get_open_trades():
 
 def get_current_price(ticker):
     stock = yf.Ticker(ticker)
-    return stock.history().tail(1)['Close'].iloc[0]
+    history = stock.history().tail(1)
+    if not history.empty:
+        return history['Close'].iloc[0]
+    else:
+        return None
 
 # Streamlit Interface
 st.title("Stock Trading App")
