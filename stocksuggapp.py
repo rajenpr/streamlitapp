@@ -18,6 +18,7 @@ def get_open_trades():
     return list(collection.find({"status": "open"}))
 
 def get_current_price(ticker):
+    ticker_final=ticker+'.NS'
     stock = yf.Ticker(ticker)
     history = stock.history().tail(1)
     if not history.empty:
