@@ -51,6 +51,7 @@ with st.form("stock_input"):
         insert_trade(trade_data)
         st.success("Trade data submitted!")
 
+# Display open trades
 if st.button("Show Open Trades"):
     open_trades = get_open_trades()
 
@@ -67,13 +68,17 @@ if st.button("Show Open Trades"):
             "Entry Price": trade['entry_price'],
             "Target Price": trade['target_price'],
             "Current Price": current_price,
-            "Duration":trade['duration'],
-            "Potential Gain (%)": f"{potential_gain:.2f}"
+            "Potential Gain (%)": potential_gain
         })
 
     # Convert list to DataFrame
-    trades_df[['Entry Price', 'Target Price', 'Current Price', 'Potential Gain (%)']] = trades_df[['Entry Price', 'Target Price', 'Current Price', 'Potential Gain (%)']].round(2)
-        
+    trades_df = pd.DataFrame(table_data)
+
+    # Convert to numeric and round the numerical columns to two decimal places
+    trades_df['Entry Price'] = pd.to_numeric(trades_df['Entry Price']).round(2)
+    trades_df['Target Price'] = pd.to_numeric(trades_df['Target Price']).round(2)
+    trades_df['Current Price'] = pd.to_numeric(trades_df['Current Price']).round(2)
+    trades_df['Potential Gain (%)'] = pd.to_numeric(trades_df['Potential Gain (%)']).round(2)
 
     # Display the DataFrame as a table
     st.table(trades_df)
