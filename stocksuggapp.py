@@ -8,7 +8,7 @@ mongo_conn_str = "mongodb+srv://prajendr:Mazda123@cluster0.5hmuadl.mongodb.net/s
 
 # Initialize connection to MongoDB
 client = pymongo.MongoClient(mongo_conn_str)
-db = client.stocksuggappdb
+db = client["stocksuggappdb"]
 collection = db.stocksuggappcol
 
 def insert_trade(data):
