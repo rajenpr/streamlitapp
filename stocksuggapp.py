@@ -37,19 +37,10 @@ def get_current_price(ticker):
 def display_trades(trades, title):
     active_trades_data = []
     untriggered_trades_data = []
+    closed_trades_data = []
 
     for trade in trades:
         current_price = get_current_price(trade['ticker_symbol']) if trade['status'] == 'open' else trade.get('last_known_price', "N/A")
-        if trade['status'] == 'open' and current_price is not None:
-            if current_price >= trade['target_price']:
-                update_trade_status(trade['_id'], "closed", last_known_price=current_price)
-                trade['status'] = "closed"
-                potential_gain_formatted = "Target Achieved"
-            else:
-                potential_gain = ((trade['target_price'] - current_price) / current_price) * 100
-                potential_gain_formatted = "{:.2f}".format(potential_gain)
-        else:
-            potential_gain_formatted = "Trade Closed"
 
         trade_info = {
             "Stock": f"{trade['stock_name']} ({trade['ticker_symbol']})",
@@ -57,15 +48,24 @@ def display_trades(trades, title):
             "Target Price": "{:.2f}".format(trade['target_price']),
             "Current Price": "{:.2f}".format(current_price) if current_price != "N/A" else current_price,
             "Duration": trade['duration'],
-            "Potential Gain (%)": potential_gain_formatted,
             "Status": trade['status']
         }
 
-        if trade['status'] == 'open':
-            if current_price >= trade['entry_price']:
+        if trade['status'] == 'open' and current_price is not None:
+            potential_gain = ((trade['target_price'] - current_price) / current_price) * 100
+            trade_info["Potential Gain (%)"] = "{:.2f}".format(potential_gain)
+
+            if current_price >= trade['target_price']:
+                update_trade_status(trade['_id'], "closed", last_known_price=current_price)
+                trade['status'] = "closed"
+                closed_trades_data.append(trade_info)
+            elif current_price >= trade['entry_price']:
                 active_trades_data.append(trade_info)
             else:
                 untriggered_trades_data.append(trade_info)
+        elif trade['status'] == 'closed':
+            trade_info["Potential Gain (%)"] = "Trade Closed"
+            closed_trades_data.append(trade_info)
 
     if active_trades_data:
         st.subheader(title + " - Active Trades")
@@ -74,6 +74,10 @@ def display_trades(trades, title):
     if untriggered_trades_data:
         st.subheader(title + " - Untriggered Trades")
         st.table(pd.DataFrame(untriggered_trades_data))
+
+    if closed_trades_data:
+        st.subheader(title + " - Closed Trades")
+        st.table(pd.DataFrame(closed_trades_data))
 
 # Streamlit Interface
 st.title("Stock Trading App")
