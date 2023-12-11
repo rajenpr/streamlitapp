@@ -67,6 +67,7 @@ if st.button("Show Open Trades"):
             "Entry Price": trade['entry_price'],
             "Target Price": trade['target_price'],
             "Current Price": current_price,
+            "Duration":trade['duration']
             "Potential Gain (%)": f"{potential_gain:.2f}"
         })
 
