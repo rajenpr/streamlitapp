@@ -102,12 +102,17 @@ with st.form("stock_input"):
         st.success("Trade data submitted!")
 # Display trades
 if st.button("Refresh Trades"):
-    for term in ["Short Term", "Medium Term", "Long Term"]:
-        st.header(f"{term} Trades")
+    duration_ranges = {
+        "Short Term": "1-3 months",
+        "Medium Term": "3-12 months",
+        "Long Term": "1-3 years"
+    }
+
+    for term, range_info in duration_ranges.items():
+        st.header(f"{term} Trades ({range_info})")
         open_trades = get_trades_by_status_and_duration("open", term)
         closed_trades = get_trades_by_status_and_duration("closed", term)
         display_trades(open_trades, f"{term} Open Trades")
         display_trades(closed_trades, f"{term} Closed Trades")
-
 
 
