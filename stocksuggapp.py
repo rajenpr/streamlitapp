@@ -13,41 +13,36 @@ client = pymongo.MongoClient(mongo_conn_str)
 db = client["stocksuggappdb"]
 collection = db.stocksuggappcol
 
-def insert_trade(data):
+def insert_trade(data: dict) -> None:
     collection.insert_one(data)
 
-def get_trades_by_status(status):
-    return list(collection.find({"status": status}))
+def get_trades_by_status_and_duration(status: str, duration: str) -> list:
+    return list(collection.find({"status": status, "duration": duration}))
 
-def update_trade_status(trade_id, new_status, last_known_price=None):
+def update_trade_status(trade_id: str, new_status: str, last_known_price: float = None) -> None:
     update_data = {"status": new_status}
     if last_known_price is not None:
         update_data["last_known_price"] = last_known_price
     collection.update_one({"_id": trade_id}, {"$set": update_data})
 
-def get_current_price(ticker):
+def get_current_price(ticker: str) -> float:
     ticker_final = ticker + '.NS'
     stock = yf.Ticker(ticker_final)
     history = stock.history().tail(1)
-    if not history.empty:
-        return history['Close'].iloc[0]
-    else:
-        return None
+    return history['Close'].iloc[0] if not history.empty else None
 
-def display_trades(trades, title):
+def display_trades(trades: list, title: str) -> None:
     active_trades_data = []
     untriggered_trades_data = []
     closed_trades_data = []
 
     for trade in trades:
         current_price = get_current_price(trade['ticker_symbol']) if trade['status'] == 'open' else trade.get('last_known_price', "N/A")
-
         trade_info = {
             "Stock": f"{trade['stock_name']} ({trade['ticker_symbol']})",
             "Entry Price": "{:.2f}".format(trade['entry_price']),
             "Target Price": "{:.2f}".format(trade['target_price']),
             "Current Price": "{:.2f}".format(current_price) if current_price != "N/A" else current_price,
-            "Duration": trade['duration'],
             "Status": trade['status']
         }
 
@@ -70,14 +65,17 @@ def display_trades(trades, title):
     if active_trades_data:
         st.subheader(title + " - Active Trades")
         st.table(pd.DataFrame(active_trades_data))
+        st.markdown("---")
 
     if untriggered_trades_data:
         st.subheader(title + " - Untriggered Trades")
         st.table(pd.DataFrame(untriggered_trades_data))
+        st.markdown("---")
 
     if closed_trades_data:
         st.subheader(title + " - Closed Trades")
         st.table(pd.DataFrame(closed_trades_data))
+        st.markdown("---")
 
 # Streamlit Interface
 st.title("Stock Trading App")
@@ -102,11 +100,14 @@ with st.form("stock_input"):
         }
         insert_trade(trade_data)
         st.success("Trade data submitted!")
-
-# Display sections for Active, Untriggered, and Closed trades
+# Display trades
 if st.button("Refresh Trades"):
-    open_trades = get_trades_by_status("open")
-    closed_trades = get_trades_by_status("closed")
+    for term in ["Short Term", "Medium Term", "Long Term"]:
+        st.header(f"{term} Trades")
+        open_trades = get_trades_by_status_and_duration("open", term)
+        closed_trades = get_trades_by_status_and_duration("closed", term)
+        display_trades(open_trades, f"{term} Open Trades")
+        display_trades(closed_trades, f"{term} Closed Trades")
 
-    display_trades(open_trades, "Open Trades")
-    display_trades(closed_trades, "Closed Trades")
+
+
