@@ -57,9 +57,7 @@ def display_trades(trades: list, title: str) -> None:
         else:
             formatted_current_price = current_price  # Use 'N/A' as is
             potential_gain = "N/A"
-        else:
-            current_price = float(current_price)
-            formatted_current_price = "{:.2f}".format(current_price)
+
 
             # Calculate potential_gain only if current_price is not zero
             if current_price != 0:
