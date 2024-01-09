@@ -37,17 +37,25 @@ def display_trades(trades: list, title: str) -> None:
     closed_trades_data = []
  
     for trade in trades:
-        # Initialize current_price
-        current_price = None
-
-        # Retrieve and check current_price
+        # Get current_price, ensuring it's either a float or 'N/A'
         if trade['status'] == 'open':
             current_price = get_current_price(trade['ticker_symbol'])
+            if current_price is None:  # Check for None and convert to 'N/A'
+                current_price = "N/A"
         else:
             current_price = trade.get('last_known_price', "N/A")
 
-        if current_price is None or current_price == "N/A":
-            formatted_current_price = "N/A"
+        # Check if current_price is a float for formatting
+        if isinstance(current_price, float):
+            formatted_current_price = "{:.2f}".format(current_price)
+            # Calculate potential_gain if current_price is not zero
+            if current_price != 0:
+                potential_gain = ((trade['target_price'] - current_price) / current_price) * 100
+                potential_gain = "{:.2f}".format(potential_gain)
+            else:
+                potential_gain = "N/A"
+        else:
+            formatted_current_price = current_price  # Use 'N/A' as is
             potential_gain = "N/A"
         else:
             current_price = float(current_price)
