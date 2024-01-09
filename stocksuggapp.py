@@ -35,11 +35,23 @@ def display_trades(trades: list, title: str) -> None:
     active_trades_data = []
     untriggered_trades_data = []
     closed_trades_data = []
-
+ 
     for trade in trades:
-        current_price = get_current_price(trade['ticker_symbol']) if trade['status'] == 'open' else trade.get('last_known_price', "N/A")
-        if current_price is None:
-            current_price = "N/A"
+     current_price = get_current_price(trade['ticker_symbol']) if trade['status'] == 'open' else trade.get('last_known_price', "N/A")
+    if current_price is None or current_price == "N/A":
+        current_price = "N/A"
+        potential_gain = "N/A"
+    else:
+        # Ensure current_price is a float to avoid type errors in formatting
+        current_price = float(current_price)
+        formatted_current_price = "{:.2f}".format(current_price)
+
+        # Calculate potential_gain only if current_price is not zero
+        if current_price != 0:
+            potential_gain = ((trade['target_price'] - current_price) / current_price) * 100
+            potential_gain = "{:.2f}".format(potential_gain)
+        else:
+            potential_gain = "N/A"
         trade_info = {
             "Stock": f"{trade['stock_name']} ({trade['ticker_symbol']})",
             "Entry Price": "{:.2f}".format(trade['entry_price']),
