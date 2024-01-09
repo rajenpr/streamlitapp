@@ -38,6 +38,8 @@ def display_trades(trades: list, title: str) -> None:
 
     for trade in trades:
         current_price = get_current_price(trade['ticker_symbol']) if trade['status'] == 'open' else trade.get('last_known_price', "N/A")
+        if current_price is None:
+            current_price = "N/A"
         trade_info = {
             "Stock": f"{trade['stock_name']} ({trade['ticker_symbol']})",
             "Entry Price": "{:.2f}".format(trade['entry_price']),
